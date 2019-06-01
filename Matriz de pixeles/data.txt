@@ -1,0 +1,4 @@
+1- ver columna con mas datos (774 la que tiene mas datos)
+2- non-linear fit in 1 dimension (nfit1d), usa ameba
+3- c1*(x-c2)+c3*(exp(c4*abs(x-c2))-1.0) -> 518.3373 c2 478.6363 c3 3392.931 c4 -0.5909165
+3b- 90-c1*(exp(abs(x-c2)/c3)-1.0)+c4*(abs(x-c2))**c5
