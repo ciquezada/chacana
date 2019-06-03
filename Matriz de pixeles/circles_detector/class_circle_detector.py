@@ -63,12 +63,14 @@ class circle_detector():
             if (X_CENTER[0]<=i[0]<=X_CENTER[1]
                                     and Y_CENTER[0]<=i[1]<=Y_CENTER[1]):
                 out.append((i[1], i[0]))
-                # draw the outer circle
-                print("detection: y = {}, x = {}".format(i[1],i[0]))
-                cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
-                # draw the center of the circle
-                cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
-        cv2.imshow('detected circles',cimg)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        # ######### mostrar circulos
+        #         # draw the outer circle
+        #         print("detection: y = {}, x = {}".format(i[1],i[0]))
+        #         cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
+        #         # draw the center of the circle
+        #         cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
+        # cv2.imshow('detected circles',cimg)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+        # ######################################################################
         return out
