@@ -1,6 +1,3 @@
-import imageio
-import numpy as np
-import pandas as pd
 
 
 def create_empty_matrix(y, x):

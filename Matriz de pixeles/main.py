@@ -6,9 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
 import lib as lib
-from surface_test import show_surface, test_surface
 from scipy import interpolate
-from metrics import plot_interpolation_vs_experimental, plot_experimental_pixel_row, animation_3d_plot_interpolation_vs_experimental, animation_plot_interpolation_vs_experimental
 from circles_detector.class_circle_detector import circle_detector
 from scipy import stats
 
@@ -72,35 +70,6 @@ if __name__=="__main__":
         # table.save_preview_image_az(cwd+os.sep+path_image)
     """                            """
 
-    """ vista previa de la superficie (alt) """
-    # table = PixelTable(new_matrix = P.NEW_MATRIX, data_path = P.PATH_ACTUAL_DATA)
-    # test_surface(table)
-    # interpolated_table = PixelTable(data_path = "Interpolated_Data.pixtab")
-    # test_surface(interpolated_table)
-    """                                     """
-
-    """ graficar una linea de pixeles """
-    # pos = "x"
-    # pixel = 757
-    # component = "alt"
-    # experimental_path = "Data.pixtab"
-    # plot_experimental_pixel_row(pos, pixel, component, experimental_path)
-    """                               """
-
-    """ comparar tabla experimental con interpolada """
-    # pos = "y"
-    # for pixel in range(491,600):
-    #     # pixel = 757
-    #     component = "alt"
-    # experimental_path = "Data.pixtab"
-    # interpolated_path = "Interpolated_Data.pixtab"
-    # #     plot_interpolation_vs_experimental(pos, pixel, component,
-    # #                                     experimental_path, interpolated_path)
-    # animation_3d_plot_interpolation_vs_experimental(experimental_path, interpolated_path)
-
-
-    """                                             """
-
     """ obtener altura y azimuth según pixeles """
     # table = PixelTable(data_path = "Data.pixtab")
     # table = PixelTable(data_path = "Interpolated_Data.pixtab")
@@ -109,7 +78,7 @@ if __name__=="__main__":
     # print(table.df.query("x==730").dropna())
     """                                        """
 
-    """ obtener altura y azimuth según pixeles """
+    """ obtener pixeles según altura y azimuth """
     # table = PixelTable(data_path = "Data.pixtab")
     # az = 30
     # alt = 31

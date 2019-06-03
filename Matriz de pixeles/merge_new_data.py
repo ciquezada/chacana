@@ -20,6 +20,9 @@ if __name__=="__main__":
     path_log = P.LOG_FOLDER+os.sep+P.PATH_LOG
 
     """ Merge new data """
+    if P.SAVE_BCKP:
+        table.export_to_file(cwd+os.sep+out_bckp_path)
+        log += P.TEMPLATE_BCKP_LOG.format(out_bckp_path)
     if P.MERGE:
         data = pd.read_csv(P.PATH_NEW_DATA, sep=" ")
         table.merge_dataframe(data)
@@ -29,8 +32,5 @@ if __name__=="__main__":
     if P.SAVE_PREVIEW:
         table.save_preview_image(cwd+os.sep+path_image)
         log += P.TEMPLATE_IMAGE_LOG.format(path_image)
-    if P.SAVE_BCKP:
-        table.export_to_file(cwd+os.sep+out_bckp_path)
-        log += P.TEMPLATE_BCKP_LOG.format(out_bckp_path)
     with open(cwd+os.sep+path_log, mode = "a", encoding = "UTF-8") as file:
         file.write(log)
