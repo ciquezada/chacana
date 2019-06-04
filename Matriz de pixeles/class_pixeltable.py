@@ -8,6 +8,29 @@ from circles_detector.class_circle_detector import circle_detector
 from scipy import stats
 
 
+class ImageHandler:
+
+    def __init__(self):
+        self.image = type(imageio)
+
+    def create():
+        col = "alt"
+        print("\nCreando vista previa de pixeles")
+        total = self.df.shape[0]
+        new_im = imageio.imread(P.PATH_MASK)
+        lib.printProgressBar(0, total)
+        for indx in self.df.index:
+            x = self[indx,'x']
+            y = self[indx,'y']
+            val = self[indx, col]
+            self._coloring_pixels(x, y, val, new_im)
+            lib.printProgressBar(indx, total)
+
+    def save_preview_image(self, path):
+
+        imageio.imwrite(path, new_im)
+        print("Exito")
+
 
 
 class PixelTable:
