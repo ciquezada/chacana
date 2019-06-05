@@ -62,11 +62,12 @@ if __name__=="__main__":
 
     """ obtener imagen de la tabla """
     # table = PixelTable(data_path = "Data.pixtab")
-    # table = PixelTable(data_path = "Interpolated_Data.pixtab")
-    # if P.SAVE_PREVIEW:
-    #     time = datetime.now().strftime(P.TIME_FORMAT)
-    #     path_image = P.PREVIEW_IMAGES_FOLDER+os.sep+P.PATH_PREVIEW_IMAGE.format(time)
-    #     table.save_preview_image(cwd+os.sep+path_image)
+    table = PixelTable(data_path = "Interpolated_Data.pixtab")
+    table.preview.alt
+    table.preview.az
+    if P.SAVE_PREVIEW:
+        path_image = (cwd + os.sep + P.PREVIEW_IMAGES_FOLDER + os.sep)
+        table.preview.save(path_image + "Interpolated_Data_")
         # table.save_preview_image_az(cwd+os.sep+path_image)
     """                            """
 
