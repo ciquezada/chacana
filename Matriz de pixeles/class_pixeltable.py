@@ -6,9 +6,95 @@ import lib as lib
 from interpolate_test import interp_spline, interp_cubicspline
 from circles_detector.class_circle_detector import circle_detector
 from scipy import stats
+from datetime import datetime
+
+import matplotlib.pyplot as plt
 
 
+class ImageHandler:
 
+    TIME_FORMAT = "%m-%d-%Y_%Hh%Mm%Ss"
+    PATH_MASK = "mask.png"
+
+    def __init__(self, pixels):
+        self._pixels = pixels
+        self._image_alt = None
+        self._image_az = None
+
+    @property
+    def alt(self):
+        if not isinstance(self._image_alt, type(np.array([]))):
+            self.create()
+        plt.imshow(self._image_alt)
+        plt.axis("off")
+        plt.show()
+
+    @property
+    def az(self):
+        if not isinstance(self._image_az, type(np.array([]))):
+            self.create()
+        plt.imshow(self._image_az)
+        plt.axis("off")
+        plt.show()
+
+    def save(self, dir_path = ""):
+        if not isinstance(self._image_az, type(np.array([]))):
+            self.create()
+        time = datetime.now().strftime(self.TIME_FORMAT)
+        imageio.imwrite(dir_path + "{}_altitude.png".format(time),
+                                                                self._image_alt)
+        imageio.imwrite(dir_path + "{}_azimuth.png".format(time),
+                                                                self._image_az)
+
+    def create(self):
+        print("\nCreando vista previa de pixeles")
+        total = self._pixels.shape[0]
+        self._image_alt = imageio.imread(P.PATH_MASK)
+        self._image_az = imageio.imread(P.PATH_MASK)
+        lib.printProgressBar(0, total)
+        for indx in self._pixels.index:
+            x = self._pixels.at[indx,'x']
+            y = self._pixels.at[indx,'y']
+            alt = self._pixels.at[indx, "alt"]
+            az = self._pixels.at[indx, "az"]
+            self._coloring_pixels_alt(x, y, alt)
+            self._coloring_pixels_az(x, y, az)
+            lib.printProgressBar(indx, total)
+        print("Exito!")
+
+    def _coloring_pixels_alt(self, x, y, val):
+        c = [*range(0,86,20)]
+        if not np.isnan(val):
+            # if 88 <= val < 90:
+            #     new_im[y,x,0] = 250
+            if any([*(c[i-1]<=val<c[i] for i in range(1, len(c), 3))]):
+                self._image_alt[y,x,0] = 250
+            elif any([*(c[i-1]<=val<c[i] for i in range(2, len(c), 3))]):
+                self._image_alt[y,x,1] = 250
+            elif any([*(c[i-1]<=val<c[i] for i in range(3, len(c), 3))]):
+                self._image_alt[y,x,2] = 250
+            elif 80 <= val < 85:
+                self._image_alt[y,x,1] = 250
+            elif 85 <= val:
+                self._image_alt[y,x,0] = 140
+                self._image_alt[y,x,1] = 140
+                self._image_alt[y,x,2] = 250
+            else:
+                self._image_alt[y,x,0] = 250
+                self._image_alt[y,x,1] = 250
+                self._image_alt[y,x,2] = 250
+
+    def _coloring_pixels_az(self, x, y, val):
+        c = [*range(0,360,20)]
+        if not np.isnan(val):
+            # if 88 <= val < 90:
+            #     new_im[y,x,0] = 250
+            if any([*(c[i-1]<=val<c[i] for i in range(1, len(c), 3))]):
+                self._image_az[y,x,0] = 250
+            elif any([*(c[i-1]<=val<c[i] for i in range(2, len(c), 3))]):
+                self._image_az[y,x,1] = 250
+            elif any([*(c[i-1]<=val<c[i] for i in range(3, len(c), 3))]):
+                self._image_az[y,x,2] = 250
 
 class PixelTable:
     """
@@ -20,19 +106,21 @@ class PixelTable:
 
     def __init__(self, new_matrix = False, data_path = False):
         if new_matrix:
-            self._init_new_matrix()
+            self.df = self.empty_pixtab()
         elif data_path:
             self.df = pd.read_csv(data_path, sep=" ")
         else:
             print("No se ingresaron parametros")
+        self.preview = ImageHandler(self.df)
 
-    def _init_new_matrix(self):
+    @staticmethod
+    def empty_pixtab():
         df_header = ["x", "y", "alt", "az", "alt_err", "az_err", "sample_size"]
         df_data = []
-        for j in range(self.Y_RESOLUTION):
-            for i in range(self.X_RESOLUTION):
+        for j in range(P.Y_RESOLUTION):
+            for i in range(P.X_RESOLUTION):
                 df_data.append([i, j, np.NaN, np.NaN, np.NaN, np.NaN, 0])
-        self.df = pd.DataFrame(df_data, columns= df_header)
+        return pd.DataFrame(df_data, columns= df_header)
 
     def export_to_file(self, path):
         """
@@ -41,55 +129,6 @@ class PixelTable:
         """
         self.df.to_csv(path, sep=' ', index=False)
         return 1
-
-    def save_preview_image(self, path):
-        col = "alt"
-        print("\nCreando vista previa de pixeles")
-        total = self.df.shape[0]
-        new_im = imageio.imread(P.PATH_MASK)
-        lib.printProgressBar(0, total)
-        for indx in self.df.index:
-            x = self[indx,'x']
-            y = self[indx,'y']
-            val = self[indx, col]
-            self._coloring_pixels(x, y, val, new_im)
-            lib.printProgressBar(indx, total)
-        imageio.imwrite(path, new_im)
-        print("Exito")
-
-    def save_preview_image_az(self, path):
-        c = [*range(0,361,30)]
-        col = "az"
-        print("\nCreando vista previa de pixeles...")
-        total = self.df.shape[0]
-        new_im = imageio.imread(P.PATH_MASK)
-        lib.printProgressBar(0, total)
-        for indx in self.df.index:
-            x = self[indx,'x']
-            y = self[indx,'y']
-            val = self[indx, col]
-            if not np.isnan(val):
-                if any([*(c[i-1]<=val<c[i] for i in range(1, len(c), 3))]):
-                    new_im[y,x,0] = 250
-                elif any([*(c[i-1]<=val<c[i] for i in range(2, len(c), 3))]):
-                    new_im[y,x,1] = 250
-                elif any([*(c[i-1]<=val<c[i] for i in range(3, len(c), 3))]):
-                    new_im[y,x,2] = 250
-                # elif 80 <= val < 85:
-                #     new_im[y,x,1] = 250
-                # elif 85 <= val:
-                #     new_im[y,x,0] = 140
-                #     new_im[y,x,1] = 140
-                #     new_im[y,x,2] = 250
-                # else:
-                #     new_im[y,x,0] = 250
-                #     new_im[y,x,1] = 250
-                #     new_im[y,x,2] = 250
-
-
-            lib.printProgressBar(indx, total)
-        imageio.imwrite(path, new_im)
-        print("Exito")
 
     def merge_dataframe(self, new_df):
         m_alt, m_az = self._merge_dataframe_extract_3dmatrix(new_df)
@@ -133,6 +172,7 @@ class PixelTable:
                     prom_alt_new, prom_az_new, new_err_alt, new_err_az)
             lib.printProgressBar(indx, total)
         print("Done")
+        self.preview = ImageHandler(self.df)
 
     def _merge_dataframe_extract_3dmatrix(self, df):
         total = df.shape[0]
@@ -167,28 +207,6 @@ class PixelTable:
             prom_i_old = prom_i
         new_samsize = samsize + len(m)
         return np.sqrt(s_n/new_samsize)
-
-    def _coloring_pixels(self, x, y, val, new_im):
-        c = [*range(0,86,20)]
-        if not np.isnan(val):
-            # if 88 <= val < 90:
-            #     new_im[y,x,0] = 250
-            if any([*(c[i-1]<=val<c[i] for i in range(1, len(c), 3))]):
-                new_im[y,x,0] = 250
-            elif any([*(c[i-1]<=val<c[i] for i in range(2, len(c), 3))]):
-                new_im[y,x,1] = 250
-            elif any([*(c[i-1]<=val<c[i] for i in range(3, len(c), 3))]):
-                new_im[y,x,2] = 250
-            elif 80 <= val < 85:
-                new_im[y,x,1] = 250
-            elif 85 <= val:
-                new_im[y,x,0] = 140
-                new_im[y,x,1] = 140
-                new_im[y,x,2] = 250
-            else:
-                new_im[y,x,0] = 250
-                new_im[y,x,1] = 250
-                new_im[y,x,2] = 250
 
     def __getitem__(self, coords):
         if len(coords) == 2 and type(coords[1])==int:
@@ -319,7 +337,7 @@ class InterpolatedPixelTablebycenter(PixelTable):
         r_range = np.linspace(0, P.MAX_RADIO, P.RADIO_STEPS)
         lib.printProgressBar(0, P.MAX_RADIO)
         for r in r_range:
-            query = "{}//0.1*10 == ((x-{})**2 + (y-{})**2)**(1/2)//0.1*10"
+            query = "{}//0.1 == ((x-{})**2 + (y-{})**2)**(1/2)//0.1"
             df_circle = data.query(query.format(r, self.x_center,
                                                         self.y_center)).dropna()
             if len(df_circle)>0:
