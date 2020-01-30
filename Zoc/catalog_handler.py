@@ -15,10 +15,13 @@ from tools import PBarATP
 CATALOG_PATH = "bsc5.dat"
 EL_SAUCE = EarthLocation(lat=-30.4726064*u.deg, lon=-70.7653747*u.deg, height=789*u.m)
 BEST_QUERY = "alt > 20 and Vmag < 4"
-PIXTAB_PATH = "09-10-2019_05h24m41s_Interpolated_Data_handcraft.pixtab"
+# PIXTAB_PATH = "09-10-2019_05h24m41s_Interpolated_Data_handcraft.pixtab"
+PIXTAB_PATH = "Interpolated_Data[pipeline].pixtab"
+
 OBS_TIME = [
+            "2019-9-7 08:30:10"
             # "2019-9-10 09:00:02",
-            "2019-9-10 09:15:17",
+            # "2019-9-10 09:15:17",
             # "2019-9-10 09:29:58",
             # "2019-9-10 09:45:04",
             # "2019-9-10 10:00:00"
@@ -42,6 +45,7 @@ class Catalog():
         p = Pool(self.NUM_PROC)
         raw_data = p.imap(self._worker_read_catalog,
                     self._gen_worker_args_read_catalog(path, alt_az_frame))
+
         data = pd.DataFrame(raw_data, columns = header)
         return data
 
@@ -59,7 +63,7 @@ class Catalog():
     def find_nearest_pixel(self, star_data, df_pixtab):
         best_alt_az = ((df_pixtab.dropna().alt - star_data.alt).abs()
                            + (df_pixtab.dropna().az - star_data.az).abs())
-        return df_pixtab.iloc[best_alt_az.idxmin()]
+        return df_pixtab.loc[best_alt_az.idxmin()]
 
     def _gen_worker_args(self, catalogue_df, df_pixtab, *args, **kwargs):
         for indx in PBarATP(catalogue_df.index, name="Objects"):
@@ -68,11 +72,13 @@ class Catalog():
     def _worker(self, args):
         star_data, df_pixtab= args
         nearest_pixel = self.find_nearest_pixel(star_data, df_pixtab)
-        return nearest_pixel.append(star_data[["star_name", "ra", "dec"]])
+        star_data["real_alt"] = star_data["alt"]
+        star_data["real_az"] = star_data["az"]
+        return nearest_pixel.append(star_data[["star_name", "ra", "dec", "real_alt", "real_az"]])
 
     def _gen_worker_args_read_catalog(self, path, alt_az_frame):
         with open(path, "r", encoding="utf-8") as file:
-            for i, line in PBarATP(file, 9110, name="{}".format(path)):
+            for line in PBarATP(file, 9110, name="{}".format(path)):
                 if line.replace("\n","")[75:77] != "  ":
                     yield (line, alt_az_frame)
 
@@ -118,9 +124,11 @@ class CatalogImageHandler(ImageHandler):
         print("Exito!")
 
     def _coloring_pixels_preview(self, x, y):
-        self._image_preview[int(y),int(x),0] = 250
-        self._image_preview[int(y),int(x),1] = 250
-        self._image_preview[int(y),int(x),2] = 250
+        for i in range(3):
+            for j in range(3):
+                self._image_preview[int(y-1+j),int(x-1+i),0] = 250
+                self._image_preview[int(y-1+j),int(x-1+i),1] = 250
+                self._image_preview[int(y-1+j),int(x-1+i),2] = 250
 
     def save(self):
         if not isinstance(self._image_preview, type(np.array([]))):
@@ -141,6 +149,8 @@ if __name__=="__main__":
         catalog = Catalog(CATALOG_PATH, Time(obs_time))
         pixtab = PixelTable(PIXTAB_PATH)
         catalog_pixtab = catalog.find_on_pixtab(pixtab.df)
-        preview = CatalogImageHandler(catalog_pixtab)
-        preview.preview
+        print(catalog_pixtab)
+        catalog_pixtab.to_csv("catalog.dat", sep=',', index=False)
+        # preview = CatalogImageHandler(catalog_pixtab)
+        # preview.preview
         # preview.save()

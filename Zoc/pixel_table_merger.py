@@ -59,6 +59,7 @@ class Merger:
             return pixel_info
 
     def _merge_dataframe(self, df_merged, df_pixtab, df_dat):
+        print("\nIniciando Merger...")
         m_alt, m_az = self._extract_3dmatrix(df_dat)
         # pbar = ProgressBarCounter(df_pixtab.shape[0])
         print("\nReduciendo y fusionando nuevos datos...")

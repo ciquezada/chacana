@@ -10,7 +10,7 @@ import time
 class ImageHandler:
 
     TIME_FORMAT = "%m-%d-%Y_%Hh%Mm%Ss"
-    PATH_MASK = "black_mask.png"
+    PATH_MASK = "mask.png"
     NUM_PROC = 10
 
     def __init__(self, pixels, *args, **kwargs):

@@ -8,16 +8,19 @@ import matplotlib.animation as animation
 
 
 EXP_PATH = ".." + os.sep + "Data.pixtab"
-INT_PATH = ".." + os.sep + "Interpolated_Data.pixtab"
+# EXP_PATH = ".." + os.sep + "drop_outlayers.pixtab"
+INT_PATH = ".." + os.sep + "Interpolated_Data[pipeline].pixtab"
+
 
 CTE_PARAM = "x"
 X_AXIS = "y"
 Y_AXIS = "alt"
 
 SAVE_PATH = None
+# SAVE_PATH = "plot_alt.mp4"
 
 def update_lines(i, tables, lines, title, cte_param, x_axis, y_axis):
-    title.set_text('Interpolating vs Experimental data on x={}'.format(i))
+    title.set_text('$Xi^2_z=2.32$ Interpolated data on x={}'.format(i))
     for line, table in zip(lines, tables):
         # NOTE: there is no .set_data() for 3 dim data...
         n_table = table.df.query("{}=={}".format(cte_param, i))
@@ -55,7 +58,7 @@ def animation_plot_experimental_vs_interpolation(experimental_table,
     ax.set_ylim([0.0, 100.0])
     ax.set_ylabel('{}'.format(y_axis.upper()))
 
-    title = ax.set_title('Interpolating vs Experimental data')
+    title = ax.set_title('$Xi^2_z=2.28$ Interpolated data')
     plt.legend(loc='upper right')
 
     # Creating the Animation object
